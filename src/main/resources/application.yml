@@ -1,0 +1,82 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /encryption-service/
+
+
+spring:
+  application:
+    name: encryption-service
+  config:
+    activate:
+      on-profile: ${spring.profiles.active}
+  datasource:
+    driver-class-name: ${datasource.driver}
+    url: ${datasource.url}/encryption
+    username: ${datasource.user}
+    password: ${datasource.pass}
+    hikari:
+      maximum-pool-size: ${hikari.maximum-pool-size}
+      minimum-idle: ${hikari.minimum-idle}
+  jpa:
+    show-sql: ${jpa.show-sql}
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${hibernate-ddl-auto}
+    properties:
+      hibernate:
+        connection:
+          autocommit: ${hibernate-autocommit}
+          isolation: TRANSACTION_READ_COMMITTED
+  cache:
+    type: caffeine
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: ${lb.server.route}/service-registry/eureka
+    fetch-registry: true
+    register-with-eureka: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.cloud.client.ip-address}:${server.port}:${server.servlet.context-path}
+
+
+management:
+  endpoints:
+    web:
+      base-path: ${server.servlet.context-path}
+      exposure:
+        include: health
+  stackdriver:
+    metrics:
+      export:
+        enabled: false
+
+
+config:
+  property:
+    path: ${config.properties.path}
+    package: com.encryption
+  cache:
+    reload:
+      midnight: ${config.reload.midnight}
+      hour: ${config.reload.hour}
+  kafka:
+    server-details: ${config.kafka.server-details}
+    log-topic: ${config.kafka.log-topic}
+    enable-kafka: ${config.kafka.enable-kafka}
+
+
+logging:
+  level:
+    org:
+      springframework: ${loglevel.springframework:INFO}
+      hibernate: ${loglevel.hibernate:INFO}
+    com:
+      encryption: ${loglevel.application:DEBUG}
+      zaxxer: ${loglevel.springframework:INFO}
+      netflix:
+        discovery: ${loglevel.netflix.discovery:ERROR}
+    
